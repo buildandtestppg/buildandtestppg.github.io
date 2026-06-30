@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mojo's AI Lab — Everything We Built</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --surface2: #1a1a2e;
+            --border: #2a2a3e;
+            --text: #e0e0e8;
+            --text-dim: #8888a0;
+            --accent: #6366f1;
+            --accent2: #8b5cf6;
+            --green: #22c55e;
+            --yellow: #eab308;
+            --red: #ef4444;
+            --blue: #3b82f6;
+            --cyan: #06b6d4;
+            --pink: #ec4899;
+            --orange: #f97316;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 60px 20px 40px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+        
+        .hero h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent2), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        
+        .hero p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat .num {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        
+        .stat .label {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Section headers */
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .section-header .icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        
+        .section-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .section-header .count {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            background: var(--surface);
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        
+        /* Cards */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 16px;
+        }
+        
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        
+        .card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card-desc {
+            color: var(--text-dim);
+            font-size: 0.88rem;
+            margin-bottom: 14px;
+            line-height: 1.5;
+        }
+        
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .tag {
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .tag-live { background: rgba(34,197,94,0.15); color: var(--green); }
+        .tag-scheduled { background: rgba(99,102,241,0.15); color: var(--accent); }
+        .tag-dash { background: rgba(59,130,246,0.15); color: var(--blue); }
+        .tag-cron { background: rgba(234,179,8,0.15); color: var(--yellow); }
+        .tag-skill { background: rgba(139,92,246,0.15); color: var(--accent2); }
+        .tag-ml { background: rgba(236,72,153,0.15); color: var(--pink); }
+        .tag-research { background: rgba(6,182,212,0.15); color: var(--cyan); }
+        .tag-deployed { background: rgba(34,197,94,0.12); color: var(--green); }
+        .tag-building { background: rgba(249,115,22,0.15); color: var(--orange); }
+        
+        .card-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .card-link:hover { text-decoration: underline; }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .status-dot.live { background: var(--green); box-shadow: 0 0 6px var(--green); }
+        .status-dot.scheduled { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+        .status-dot.building { background: var(--orange); box-shadow: 0 0 6px var(--orange); }
+        .status-dot.offline { background: var(--text-dim); }
+        
+        /* Architecture diagram */
+        .arch-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .arch-box h3 {
+            margin-bottom: 16px;
+            color: var(--accent2);
+        }
+        
+        .arch-flow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        
+        .arch-node {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .arch-arrow {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+        }
+        
+        .arch-layers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .arch-layer {
+            background: var(--surface2);
+            border-radius: 8px;
+            padding: 16px;
+            border-left: 3px solid;
+        }
+        
+        .arch-layer h4 {
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .arch-layer ul {
+            list-style: none;
+            font-size: 0.85rem;
+        }
+        
+        .arch-layer li {
+            padding: 2px 0;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.8rem; }
+            .cards { grid-template-columns: 1fr; }
+            .stats-row { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>🧪 Mojo's AI Lab</h1>
+            <p>Everything we've built — trading systems, dashboards, monitoring harnesses, research tools, and the infrastructure that ties it all together.</p>
+            <div class="stats-row">
+                <div class="stat"><div class="num">18</div><div class="label">Projects</div></div>
+                <div class="stat"><div class="num">29</div><div class="label">Cron Jobs</div></div>
+                <div class="stat"><div class="num">199</div><div class="label">Skills</div></div>
+                <div class="stat"><div class="num">6</div><div class="label">Live Dashboards</div></div>
+                <div class="stat"><div class="num">2</div><div class="label">Harnesses</div></div>
+            </div>
+        </div>
+
+        <!-- Architecture Overview -->
+        <div class="arch-box">
+            <h3>🏗️ System Architecture</h3>
+            <div class="arch-flow">
+                <span class="arch-node" style="border-color: var(--green);">📡 Data Sources</span>
+                <span class="arch-arrow">→</span>
+                <span class="arch-node" style="border-color: var(--blue);">🤖 Hermes Agent</span>
+                <span class="arch-arrow">→</span>
+                <span class="arch-node" style="border-color: var(--accent);">⏰ 29 Cron Jobs</span>
+                <span class="arch-arrow">→</span>
+                <span class="arch-node" style="border-color: var(--yellow);">📊 Dashboards</span>
+                <span class="arch-arrow">→</span>
+                <span class="arch-node" style="border-color: var(--pink);">🔧 Harnesses</span>
+            </div>
+            <div class="arch-layers">
+                <div class="arch-layer" style="border-color: var(--green);">
+                    <h4>Data Sources</h4>
+                    <ul>
+                        <li>Hyperliquid DEX</li>
+                        <li>X/Twitter feeds</li>
+                        <li>arXiv papers</li>
+                        <li>Polymarket</li>
+                        <li>News RSS</li>
+                        <li>Whale alerts</li>
+                    </ul>
+                </div>
+                <div class="arch-layer" style="border-color: var(--blue);">
+                    <h4>Agent Core</h4>
+                    <ul>
+                        <li>Hermes Agent (runtime)</li>
+                        <li>199 skills library</li>
+                        <li>Fact store (128 facts)</li>
+                        <li>Session history</li>
+                        <li>Multi-model routing</li>
+                        <li>DashClaw governance</li>
+                    </ul>
+                </div>
+                <div class="arch-layer" style="border-color: var(--accent);">
+                    <h4>Automation</h4>
+                    <ul>
+                        <li>Trading (every 5min)</li>
+                        <li>Scanning (every 20min)</li>
+                        <li>Analysis (every 2-4h)</li>
+                        <li>Daily digests</li>
+                        <li>Weekly deep reviews</li>
+                        <li>System health (6h)</li>
+                    </ul>
+                </div>
+                <div class="arch-layer" style="border-color: var(--yellow);">
+                    <h4>Observability</h4>
+                    <ul>
+                        <li>6 live dashboards</li>
+                        <li>2 self-improving harnesses</li>
+                        <li>Fleet heartbeat</li>
+                        <li>Decision audit logs</li>
+                        <li>Strategy leaderboards</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trading Systems -->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background: rgba(234,179,8,0.15);">💹</div>
+                <h2>Trading Systems</h2>
+                <span class="count">3 projects · 5 crons</span>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title">
+                            <span class="status-dot live"></span>
+                            HL Strategy Lab
+                        </div>
+                    </div>
+                    <div class="card-desc">Full automated trading system for Hyperliquid. 9 strategies × 4 pairs, backtested with composite scoring (Sharpe, profit factor, win rate, drawdown). Auto-assigns best strategy per pair. Paper trading live with decision audit logging.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-live">LIVE</span>
+                        <span class="tag tag-ml">ML Scoring</span>
+                        <span class="tag tag-dash">Dashboard</span>
+                        <span class="tag tag-cron">4 Crons</span>
+                        <span class="tag tag-skill">36 Tests</span>
+                    </div>
+                    <a class="card-link" href="https://buildandtestppg.github.io/hl-strategy-lab/" target="_blank">→ View Dashboard</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title">
+                            <span class="status-dot live"></span>
+                            Arb Bots
+                        </div>
+                    </div>
+                    <div class="card-desc">Multi-strategy arbitrage system. Cross-chain arb scanner, funding rate arb, and prediction market arb v2. Shared utilities for price feeds and execution across all strategies.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-live">LIVE</span>
+                        <span class="tag tag-scheduled">Cron</span>
+                        <span class="tag tag-dash">3 Strategies</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title">
+                            <span class="status-dot scheduled"></span>
+                            Prediction Market Arb Scanner
+                        </div>
+                    </div>
+                    <div class="card-desc">Scans Polymarket and prediction markets for mispriced outcomes. Runs every 30 minutes, identifies arb opportunities across correlated markets.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-scheduled">Every 30min</span>
+                        <span class="tag tag-cron">Polymarket</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboards -->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background: rgba(59,130,246,0.15);">📊</div>
+                <h2>Live Dashboards</h2>
+                <span class="count">6 deployed</span>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> HL Strategy Lab Dashboard</div>
+                    </div>
+                    <div class="card-desc">Real-time trading dashboard with strategy leaderboard, paper trading P&L, harness test results, and decision audit trail.</div>
+                    <div class="card-tags"><span class="tag tag-deployed">DEPLOYED</span></div>
+                    <a class="card-link" href="https://buildandtestppg.github.io/hl-strategy-lab/" target="_blank">→ buildandtestppg.github.io/hl-strategy-lab</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> HYPE Monitor</div>
+                    </div>
+                    <div class="card-desc">Real-time Hyperliquid ecosystem monitor. Tracks HYPE token, staking, protocol metrics, and on-chain activity.</div>
+                    <div class="card-tags"><span class="tag tag-deployed">DEPLOYED</span></div>
+                    <a class="card-link" href="https://buildandtestppg.github.io/hype-monitor/" target="_blank">→ buildandtestppg.github.io/hype-monitor</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> Intelligence Dashboard</div>
+                    </div>
+                    <div class="card-desc">Aggregated intelligence feed — market analysis, research signals, news synthesis, and whale activity in one view.</div>
+                    <div class="card-tags"><span class="tag tag-deployed">DEPLOYED</span></div>
+                    <a class="card-link" href="https://buildandtestppg.github.io/intelligence-dashboard/" target="_blank">→ buildandtestppg.github.io/intelligence-dashboard</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> WC Portfolio Tracker</div>
+                    </div>
+                    <div class="card-desc">World Cup 2026 portfolio tracker. Tracks predictions, positions, and P&L across tournament outcome markets.</div>
+                    <div class="card-tags"><span class="tag tag-deployed">DEPLOYED</span></div>
+                    <a class="card-link" href="https://buildandtestppg.github.io/wc-portfolio/" target="_blank">→ buildandtestppg.github.io/wc-portfolio</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> Fleet Dashboard</div>
+                    </div>
+                    <div class="card-desc">Unified view of all automated agents — fleet health, task status, and coordination across the agent network.</div>
+                    <div class="card-tags"><span class="tag tag-live">LOCAL</span></div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> Hermes Control Interface</div>
+                    </div>
+                    <div class="card-desc">Self-hosted web dashboard for the Hermes AI agent stack. Manage conversations, monitor sessions, and control agent behavior from a browser.</div>
+                    <div class="card-tags"><span class="tag tag-live">LOCAL SERVER</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Harnesses -->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background: rgba(139,92,246,0.15);">🔧</div>
+                <h2>Self-Improving Harnesses</h2>
+                <span class="count">2 systems</span>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> HL Strategy Lab Harness</div>
+                    </div>
+                    <div class="card-desc">Observer → Evaluator → Paper Trader → Bundler pipeline. Backtests 9 strategies across 4 pairs every hour, auto-assigns winners, runs paper trades, and logs every decision for auditability. 36 regression tests. Weekly deep evaluation.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-live">Hourly</span>
+                        <span class="tag tag-ml">Auto-Scoring</span>
+                        <span class="tag tag-dash">Dashboard</span>
+                        <span class="tag tag-skill">36 Tests</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> Hermes System Harness</div>
+                    </div>
+                    <div class="card-desc">Monitors the Hermes agent itself — cron health, skill validity, memory hygiene, provider availability. Scores every component 0-100, flags stale facts, detects duplicate memories, boosts trust for helpful facts. The system that watches the system.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-live">Every 6h</span>
+                        <span class="tag tag-deployed">Score: 73.8</span>
+                        <span class="tag tag-skill">Auto-Improve</span>
+                    </div>
+                    <a class="card-link" href="https://buildandtestppg.github.io/hermes-harness/" target="_blank">→ buildandtestppg.github.io/hermes-harness</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Intelligence Fleet -->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background: rgba(6,182,212,0.15);">🧠</div>
+                <h2>Intelligence Fleet</h2>
+                <span class="count">8 agents · 14 crons</span>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> 📰 News Agent</div>
+                    </div>
+                    <div class="card-desc">Continuously scans news feeds for market-moving stories, crypto developments, and AI research. Delivers curated briefs to Discord.</div>
+                    <div class="card-tags"><span class="tag tag-live">Every 15min</span></div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> 🐋 Whale Monitor</div>
+                    </div>
+                    <div class="card-desc">Tracks large on-chain transfers and exchange flows. Alerts on whale movements that could signal market direction changes.</div>
+                    <div class="card-tags"><span class="tag tag-live">Every 20min</span></div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> X Crypto Scanner</div>
+                    </div>
+                    <div class="card-desc">Scans crypto Twitter/X for sentiment shifts, alpha leaks, and trending tokens. Runs every 30 minutes.</div>
+                    <div class="card-tags"><span class="tag tag-live">Every 30min</span></div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> 🔬 Research Analyst</div>
+                    </div>
+                    <div class="card-desc">Deep analysis agent. Synthesizes research from arXiv, Polymarket data, and market signals into actionable intelligence.</div>
+                    <div class="card-tags"><span class="tag tag-scheduled">Every 6h</span></div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> 💰 Trading Analyst</div>
+                    </div>
+                    <div class="card-desc">Market analysis focused on trading signals. Combines technical analysis with sentiment data for trade recommendations.</div>
+                    <div class="card-tags"><span class="tag tag-scheduled">Every 6h</span></div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> 📊 Market Analyst</div>
+                    </div>
+                    <div class="card-desc">Broad market analysis covering crypto, prediction markets, and macro trends. Daily reports with chart digests.</div>
+                    <div class="card-tags"><span class="tag tag-scheduled">Every 2h</span></div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> 🧠 Intelligence Synthesizer</div>
+                    </div>
+                    <div class="card-desc">Meta-agent that combines outputs from all other analysts into a unified daily intelligence brief. The final synthesis layer.</div>
+                    <div class="card-tags"><span class="tag tag-scheduled">Every 2h</span></div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> ⚖️ Signal Conflict Resolver</div>
+                    </div>
+                    <div class="card-desc">Detects when multiple agents produce conflicting signals (bull vs bear on same asset) and resolves with weighted reasoning.</div>
+                    <div class="card-tags"><span class="tag tag-scheduled">Every 6h</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Infrastructure -->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background: rgba(99,102,241,0.15);">⚡</div>
+                <h2>Infrastructure</h2>
+                <span class="count">4 projects</span>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> Hermes Agent</div>
+                    </div>
+                    <div class="card-desc">The core AI agent runtime (Nous Research). Multi-model routing (Z.AI, Ollama Cloud, local Ollama), 199 loaded skills, persistent memory via fact_store, session history in SQLite. Connected to Discord + local API server.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-live">RUNNING</span>
+                        <span class="tag tag-skill">199 Skills</span>
+                        <span class="tag tag-deployed">3 Providers</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> DashClaw</div>
+                    </div>
+                    <div class="card-desc">Decision infrastructure for AI agents. Governance runtime with policy enforcement, decision recording, and human-in-the-loop approval. Open-source (ucsdandman/DashClaw).</div>
+                    <div class="card-tags">
+                        <span class="tag tag-live">INTEGRATED</span>
+                        <span class="tag tag-research">Open Source</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> Fleet API</div>
+                    </div>
+                    <div class="card-desc">REST API for managing the agent fleet. Task dispatch, health checks, and coordination between agents. Includes fleet dashboard server.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-live">LOCAL</span>
+                        <span class="tag tag-dash">REST API</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> Fleet Operations Agent</div>
+                    </div>
+                    <div class="card-desc">Orchestrator that manages the fleet — dispatches tasks, monitors agent health, handles failures, and optimizes resource allocation. Runs every minute.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-live">Every minute</span>
+                        <span class="tag tag-scheduled">Orchestrator</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Research & Tools -->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background: rgba(236,72,153,0.15);">🔬</div>
+                <h2>Research & Tools</h2>
+                <span class="count">6 projects</span>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> Thoth</div>
+                    </div>
+                    <div class="card-desc">Research agent framework with its own API, scraping tools, and HIP3 websocket integration. Multi-tool research pipeline.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-research">Research</span>
+                        <span class="tag tag-live">API + WS</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> ABG-CMO (AI Avatar Generator)</div>
+                    </div>
+                    <div class="card-desc">AI-powered avatar generation using LivePortrait and SadTalker. Generates talking head videos from audio + face images. Multiple pipeline versions.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-ml">Computer Vision</span>
+                        <span class="tag tag-building">v3</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot live"></span> Mojo X Growth</div>
+                    </div>
+                    <div class="card-desc">Content pipeline for X/Twitter growth. Automated content generation, scheduling, and engagement optimization scripts.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-scheduled">Content</span>
+                        <span class="tag tag-research">Growth</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot scheduled"></span> arXiv Research Scanner</div>
+                    </div>
+                    <div class="card-desc">Scans arXiv for new papers matching configurable research interests. Automated research discovery with skill-based filtering.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-scheduled">Daily 10am</span>
+                        <span class="tag tag-research">arXiv</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot scheduled"></span> Polymarket Scanner</div>
+                    </div>
+                    <div class="card-desc">Scans Polymarket for price movements, volume spikes, and new markets. Sentiment analysis on prediction market trends.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-scheduled">Every 6h</span>
+                        <span class="tag tag-cron">Prediction Mkts</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-top">
+                        <div class="card-title"><span class="status-dot scheduled"></span> Fitness Check-in</div>
+                    </div>
+                    <div class="card-desc">Weekly automated fitness check-in. Tracks workout consistency, goals, and progress. Monday mornings.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-scheduled">Weekly Mon</span>
+                        <span class="tag tag-skill">Health</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cron Job Map -->
+        <div class="section">
+            <div class="section-header">
+                <div class="icon" style="background: rgba(249,115,22,0.15);">⏰</div>
+                <h2>Automation Map — All 29 Cron Jobs</h2>
+                <span class="count">Running 24/7</span>
+            </div>
+            <div class="arch-box">
+                <table style="width:100%; border-collapse: collapse; font-size: 0.85rem;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border); text-align: left; color: var(--text-dim);">
+                            <th style="padding: 8px;">Frequency</th>
+                            <th style="padding: 8px;">Job</th>
+                            <th style="padding: 8px;">Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--green);">Every 1min</td><td style="padding: 8px;">Cross-Chain Arb Scanner</td><td style="padding: 8px; color: var(--text-dim);">Scans for cross-chain arb opportunities</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--green);">Every 5min</td><td style="padding: 8px;">HL Paper Trader</td><td style="padding: 8px; color: var(--text-dim);">Executes paper trades on live data</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--green);">Every 5min</td><td style="padding: 8px;">HL Autonomous Optimizer</td><td style="padding: 8px; color: var(--text-dim);">Tunes strategy parameters</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--green);">Every 15min</td><td style="padding: 8px;">📰 News Agent</td><td style="padding: 8px; color: var(--text-dim);">Scans news feeds for alpha</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--green);">Every 20min</td><td style="padding: 8px;">🐋 Whale Monitor</td><td style="padding: 8px; color: var(--text-dim);">Tracks large on-chain transfers</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--green);">Every 25min</td><td style="padding: 8px;">Fleet Operations Agent</td><td style="padding: 8px; color: var(--text-dim);">Orchestrates the agent fleet</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--green);">Every 30min</td><td style="padding: 8px;">X Crypto Scanner</td><td style="padding: 8px; color: var(--text-dim);">Scans crypto Twitter for sentiment</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--green);">Every 30min</td><td style="padding: 8px;">💚 Fleet Heartbeat</td><td style="padding: 8px; color: var(--text-dim);">Health ping for all agents</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--green);">Every 30min</td><td style="padding: 8px;">Prediction Market Arb</td><td style="padding: 8px; color: var(--text-dim);">Scans Polymarket for arb</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--yellow);">Every hour</td><td style="padding: 8px;">HL Full Harness</td><td style="padding: 8px; color: var(--text-dim);">Tests + backtest + trade + bundle</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--yellow);">Every 2h</td><td style="padding: 8px;">📊 Market Analyst</td><td style="padding: 8px; color: var(--text-dim);">Broad market analysis</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--yellow);">Every 2h</td><td style="padding: 8px;">🧠 Intelligence Synthesizer</td><td style="padding: 8px; color: var(--text-dim);">Combines all analyst outputs</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--yellow);">Every 2h</td><td style="padding: 8px;">Fleet Janitor</td><td style="padding: 8px; color: var(--text-dim);">Cleans up stale fleet state</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--yellow);">Every 6h</td><td style="padding: 8px;">⚖️ Signal Conflict Resolver</td><td style="padding: 8px; color: var(--text-dim);">Resolves conflicting signals</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--yellow);">Every 6h</td><td style="padding: 8px;">🔬 Research Analyst</td><td style="padding: 8px; color: var(--text-dim);">Deep research synthesis</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--yellow);">Every 6h</td><td style="padding: 8px;">Hermes Health Harness</td><td style="padding: 8px; color: var(--text-dim);">System health check + improve</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--yellow);">Every 6h</td><td style="padding: 8px;">💰 Trading Analyst</td><td style="padding: 8px; color: var(--text-dim);">Trading signal analysis</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--yellow);">Every 6h</td><td style="padding: 8px;">Polymarket Scanner</td><td style="padding: 8px; color: var(--text-dim);">Prediction market scanning</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--yellow);">Every 6h</td><td style="padding: 8px;">Fleet Research Agent</td><td style="padding: 8px; color: var(--text-dim);">Research task dispatch</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--yellow);">Every 6h</td><td style="padding: 8px;">trading-strategy-review</td><td style="padding: 8px; color: var(--text-dim);">Reviews strategy performance</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--yellow);">Every 6h</td><td style="padding: 8px;">AutoReason Signal Weights</td><td style="padding: 8px; color: var(--text-dim);">Adjusts reasoning signal weights</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--yellow);">Every 6h</td><td style="padding: 8px;">📊 Daily Chart Digest</td><td style="padding: 8px; color: var(--text-dim);">Charts and technical summary</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--accent);">Daily</td><td style="padding: 8px;">⏰ Daily Review</td><td style="padding: 8px; color: var(--text-dim);">Daily recap and planning</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--accent);">Daily</td><td style="padding: 8px;">Daily Market Analysis</td><td style="padding: 8px; color: var(--text-dim);">Morning market brief</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--accent);">Daily</td><td style="padding: 8px;">⚽ WC Portfolio Tracker</td><td style="padding: 8px; color: var(--text-dim);">World Cup portfolio update</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--accent);">Daily</td><td style="padding: 8px;">arXiv Scanner</td><td style="padding: 8px; color: var(--text-dim);">New research papers</td></tr>
+                        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 8px; color: var(--accent);">Daily</td><td style="padding: 8px;">📸 Fitness Check-in</td><td style="padding: 8px; color: var(--text-dim);">Weekly fitness check-in</td></tr>
+                        <tr><td style="padding: 8px; color: var(--pink);">Weekly</td><td style="padding: 8px;">HL Weekly Deep Eval</td><td style="padding: 8px; color: var(--text-dim);">Extended strategy evaluation</td></tr>
+                        <tr><td style="padding: 8px; color: var(--pink);">Weekly</td><td style="padding: 8px;">Wiki Compactor</td><td style="padding: 8px; color: var(--text-dim);">Compresses accumulated knowledge</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            <p>Mojo's AI Lab — Built with Hermes Agent · 18 Projects · 29 Cron Jobs · 199 Skills · 6 Dashboards</p>
+            <p style="margin-top: 8px; color: var(--text-dim);">Last updated: June 30, 2026</p>
+        </footer>
+    </div>
+</body>
+</html>
