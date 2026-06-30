@@ -48,6 +48,7 @@
         
         .hero h1 {
             font-size: 2.8rem;
+            font-weight: 800;
             background: linear-gradient(135deg, var(--accent), var(--accent2), var(--pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -86,6 +87,105 @@
             letter-spacing: 1px;
         }
         
+        /* Harness Health Panel */
+        .harness-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 40px;
+        }
+        
+        .harness-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        
+        .harness-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .harness-title h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .harness-score-big {
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .harness-score-big .score-num {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+        
+        .harness-score-big .score-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .harness-components {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .harness-components { grid-template-columns: repeat(2, 1fr); }
+            .harness-top { flex-direction: column; gap: 16px; }
+        }
+        
+        .harness-comp {
+            background: var(--surface2);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+        
+        .harness-comp .comp-icon { font-size: 1.4rem; margin-bottom: 6px; }
+        .harness-comp .comp-name { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .harness-comp .comp-score { font-size: 1.6rem; font-weight: 800; }
+        .harness-comp .comp-detail { font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; }
+        
+        .score-healthy { color: var(--green); }
+        .score-degraded { color: var(--yellow); }
+        .score-critical { color: var(--red); }
+        
+        .harness-bar {
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 8px;
+            background: var(--border);
+            overflow: hidden;
+        }
+        
+        .harness-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.8s ease;
+        }
+        
+        .harness-updated {
+            text-align: right;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            margin-top: 12px;
+        }
+        
+        .harness-loading {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-dim);
+        }
         /* Section headers */
         .section {
             margin-bottom: 50px;
@@ -373,7 +473,12 @@
                 </div>
             </div>
         </div>
-
+        
+        <!-- Live Harness Health -->
+        <div class="harness-panel" id="harness-panel">
+            <div class="harness-loading">Loading system health...</div>
+        </div>
+        
         <!-- Trading Systems -->
         <div class="section">
             <div class="section-header">
@@ -790,5 +895,92 @@
             <p style="margin-top: 8px; color: var(--text-dim);">Last updated: June 30, 2026</p>
         </footer>
     </div>
+    <script>
+    (function() {
+        const HARNESS_URL = 'https://raw.githubusercontent.com/buildandtestppg/hermes-harness-data/main/harness_data.json';
+        
+        function tierColor(score) {
+            if (score >= 80) return { class: 'score-healthy', color: '#22c55e', label: 'HEALTHY' };
+            if (score >= 50) return { class: 'score-degraded', color: '#eab308', label: 'DEGRADED' };
+            return { class: 'score-critical', color: '#ef4444', label: 'CRITICAL' };
+        }
+        
+        function renderHarness(data) {
+            const overall = data.overall;
+            const scores = data.scores;
+            const oT = tierColor(overall.score);
+            
+            const compData = [
+                { key: 'cron', icon: '⏰', name: 'Cron Jobs', scoreKey: 'cron', detail: (s) => `${s.breakdown.ok}/${s.breakdown.total} ok` },
+                { key: 'skills', icon: '📚', name: 'Skills', scoreKey: 'skills', detail: (s) => `${s.breakdown.functional}/${s.breakdown.total} functional` },
+                { key: 'memory', icon: '🧠', name: 'Memory', scoreKey: 'memory', detail: (s) => `${s.breakdown.total} facts` },
+                { key: 'providers', icon: '🔌', name: 'Providers', scoreKey: 'providers', detail: (s) => `${s.breakdown.available}/${s.breakdown.total} up` },
+            ];
+            
+            let compsHtml = '';
+            for (const c of compData) {
+                const s = scores[c.scoreKey];
+                const t = tierColor(s.score);
+                compsHtml += `
+                    <div class="harness-comp" style="border-color: ${t.color}33;">
+                        <div class="comp-icon">${c.icon}</div>
+                        <div class="comp-name">${c.name}</div>
+                        <div class="comp-score ${t.class}">${s.score.toFixed(1)}</div>
+                        <div class="comp-detail">${c.detail(s)}</div>
+                        <div class="harness-bar"><div class="harness-bar-fill" style="width: ${s.score}%; background: ${t.color};"></div></div>
+                    </div>`;
+            }
+            
+            const issues = overall.issues || [];
+            const issuesHtml = issues.length 
+                ? issues.map(i => `<div style="font-size:0.78rem;color:var(--text-dim);padding:2px 0;">• ${i}</div>`).join('')
+                : '<div style="font-size:0.78rem;color:var(--green);">No issues ✅</div>';
+            
+            const panel = document.getElementById('harness-panel');
+            panel.innerHTML = `
+                <div class="harness-top">
+                    <div class="harness-title">
+                        <div style="font-size:1.6rem;">🩺</div>
+                        <div>
+                            <h3>System Health</h3>
+                            <div style="font-size:0.78rem;color:var(--text-dim);">Live harness data</div>
+                        </div>
+                    </div>
+                    <div class="harness-score-big">
+                        <div class="score-num ${oT.class}">${overall.score.toFixed(1)}</div>
+                        <div class="score-label">${oT.label}</div>
+                    </div>
+                </div>
+                <div class="harness-components">${compsHtml}</div>
+                <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+                    ${issuesHtml}
+                </div>
+                <div class="harness-updated">Updated: ${new Date(data.meta.generated_at).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
+            `;
+        }
+        
+        function renderError() {
+            const panel = document.getElementById('harness-panel');
+            panel.innerHTML = `
+                <div class="harness-top">
+                    <div class="harness-title">
+                        <div style="font-size:1.6rem;">🩺</div>
+                        <div><h3>System Health</h3></div>
+                    </div>
+                    <div class="harness-score-big">
+                        <div class="score-num score-degraded">—</div>
+                    </div>
+                </div>
+                <div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.85rem;">
+                    Harness data unavailable. Last known score: <strong style="color:var(--green)">90.6</strong> (Jun 30)
+                </div>`;
+        }
+        
+        fetch(HARNESS_URL)
+            .then(r => r.json())
+            .then(renderHarness)
+            .catch(renderError);
+    })();
+    </script>
 </body>
 </html>
